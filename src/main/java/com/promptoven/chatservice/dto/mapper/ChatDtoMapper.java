@@ -1,8 +1,10 @@
 package com.promptoven.chatservice.dto.mapper;
 
+import com.promptoven.chatservice.document.ChatMessageDocument;
 import com.promptoven.chatservice.document.ChatRoomDocument;
 import com.promptoven.chatservice.dto.in.ChatRoomDto;
 import com.promptoven.chatservice.dto.in.CreateRoomRequestDto;
+import com.promptoven.chatservice.dto.in.SendMessageDto;
 import com.promptoven.chatservice.dto.out.CreateRoomResponseDto;
 import com.promptoven.chatservice.vo.out.CreateRoomResponseVo;
 import java.time.LocalDateTime;
@@ -36,6 +38,15 @@ public class ChatDtoMapper {
                 .roomName(createRoomResponseDto.getRoomName())
                 .createdAt(createRoomResponseDto.getCreatedAt())
                 .updatedAt(createRoomResponseDto.getUpdatedAt())
+                .build();
+    }
+
+    public ChatMessageDocument toChatMessageDocument(SendMessageDto sendMessageDto) {
+        return ChatMessageDocument.builder()
+                .roomId(sendMessageDto.getRoomId())
+                .messageType(sendMessageDto.getMessageType())
+                .message(sendMessageDto.getMessage())
+                .senderUuid(sendMessageDto.getSenderUuid())
                 .build();
     }
 }

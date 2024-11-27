@@ -3,10 +3,11 @@ package com.promptoven.chatservice.application;
 import com.promptoven.chatservice.document.ChatRoomDocument;
 import com.promptoven.chatservice.document.mapper.ChatDocumentMapper;
 import com.promptoven.chatservice.dto.in.CreateRoomRequestDto;
+import com.promptoven.chatservice.dto.in.SendMessageDto;
 import com.promptoven.chatservice.dto.mapper.ChatDtoMapper;
 import com.promptoven.chatservice.dto.out.CreateRoomResponseDto;
+import com.promptoven.chatservice.infrastructure.MongoChatMessageRepository;
 import com.promptoven.chatservice.infrastructure.MongoChatRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,12 +18,19 @@ public class ChatServiceImpl implements ChatService {
     private final ChatDtoMapper chatDtoMapper;
     private final ChatDocumentMapper chatDocumentMapper;
     private final MongoChatRepository mongoChatRepository;
+    private final MongoChatMessageRepository mongoChatMessageRepository;
 
     @Override
     public CreateRoomResponseDto createChatRoom(CreateRoomRequestDto createRoomRequestDto) {
 
-        ChatRoomDocument chatRoomDocument = chatDtoMapper.toChatRoomDocument(chatDtoMapper.toChatRoomDto(createRoomRequestDto));
+        ChatRoomDocument chatRoomDocument = chatDtoMapper.toChatRoomDocument(
+                chatDtoMapper.toChatRoomDto(createRoomRequestDto));
 
         return chatDocumentMapper.toCreateRoomResponseDto(mongoChatRepository.save(chatRoomDocument));
+    }
+
+    @Override
+    public void sendMessage(SendMessageDto sendMessageDto) {
+        mongoChatMessageRepository.save(chatDtoMapper.toChatMessageDocument(sendMessageDto));
     }
 }
