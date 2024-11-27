@@ -1,0 +1,84 @@
+spring:
+  application:
+    name: chat-service
+  profiles:
+    active: local
+  data:
+    mongodb:
+      uri: mongodb://root:1234@mongodb:27017/chatDB?directConnection=true
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: alpha
+  packages-to-scan: com.promptoven.chatservice  # ??? ??? ??
+  default-produces-media-type: application/json
+  default-consumes-media-type: application/json
+
+logging:
+  level:
+    org.example.product_admin_service: DEBUG
+
+server:
+  shutdown: graceful
+
+# local ??
+---
+server:
+  port: 8585
+
+spring:
+  application:
+    name: chat-service
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/chatDB?directConnection=true
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+# prod ??
+---
+spring:
+  config:
+    import:
+      - classpath:eventTopic.yaml
+      - "optional:configserver:http://config-server:8888"
+    activate:
+      on-profile: prod
+  jpa:
+    hibernate:
+      ddl-auto: update  # prod ????? validate ??
+    show-sql: true
+    properties:
+      dialect: org.hibernate.dialect.MySQLDialect
+  data:
+    mongodb:
+      uri: mongodb://root:1234@mongodb:27017/reviewDB?directConnection=true
+  kafka:
+    text-bootstrap-servers: kafka-1:9092,kafka-2:9092,kafka-3:9092
+  cloud:
+    config:
+      name: review-read-service,eventTopic
+      fail-fast: false
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://discovery:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+server:
+  port: 8080
