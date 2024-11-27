@@ -2,17 +2,21 @@ package com.promptoven.chatservice.presentation;
 
 import com.promptoven.chatservice.application.ChatService;
 import com.promptoven.chatservice.dto.in.CreateRoomRequestDto;
+import com.promptoven.chatservice.dto.in.SendMessageDto;
 import com.promptoven.chatservice.dto.mapper.ChatDtoMapper;
 import com.promptoven.chatservice.global.common.response.BaseResponse;
+import com.promptoven.chatservice.vo.in.SendMessageVo;
 import com.promptoven.chatservice.vo.in.CreateRoomRequestVo;
 import com.promptoven.chatservice.vo.mapper.ChatVoMapper;
 import com.promptoven.chatservice.vo.out.CreateRoomResponseVo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequestMapping("/v1/member/chat")
 @RequiredArgsConstructor
@@ -29,5 +33,11 @@ public class ChatController {
 
         return new BaseResponse<>(
                 chatDtoMapper.toCreateRoomResponseVo(chatService.createChatRoom(createRoomRequestDto)));
+    }
+
+    @PostMapping("/send")
+    public void sendChatMessage(@RequestBody SendMessageVo sendMessageVo) {
+        log.info("sendMessageVo: {}", sendMessageVo);
+        chatService.sendMessage(chatVoMapper.toSendMessageDto(sendMessageVo));
     }
 }
