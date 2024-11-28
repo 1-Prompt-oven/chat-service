@@ -1,5 +1,6 @@
 package com.promptoven.chatservice.application;
 
+import com.promptoven.chatservice.document.ChatMessageDocument;
 import com.promptoven.chatservice.document.ChatRoomDocument;
 import com.promptoven.chatservice.document.mapper.ChatDocumentMapper;
 import com.promptoven.chatservice.dto.in.CreateRoomRequestDto;
@@ -10,6 +11,7 @@ import com.promptoven.chatservice.infrastructure.MongoChatMessageRepository;
 import com.promptoven.chatservice.infrastructure.MongoChatRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +32,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public void sendMessage(SendMessageDto sendMessageDto) {
-        mongoChatMessageRepository.save(chatDtoMapper.toChatMessageDocument(sendMessageDto));
+    public Mono<ChatMessageDocument> sendMessage(SendMessageDto sendMessageDto) {
+        return mongoChatMessageRepository.save(chatDtoMapper.toChatMessageDocument(sendMessageDto));
     }
 }
