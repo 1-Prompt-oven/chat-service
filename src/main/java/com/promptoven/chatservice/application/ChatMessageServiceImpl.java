@@ -41,7 +41,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
                         .map(document -> ChatMessageDocument.builder()
                                 .id(document.get("_id", ObjectId.class).toString())
                                 .roomId(document.getString("roomId"))
-                                .senderUuid(document.getString("senderId"))
+                                .senderUuid(document.getString("senderUuid"))
                                 .messageType(document.getString("messageType"))
                                 .message(document.getString("message"))
                                 .createdAt(LocalDateTime.ofInstant(document.getDate("createdAt").toInstant(),
