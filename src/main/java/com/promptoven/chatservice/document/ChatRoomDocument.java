@@ -1,8 +1,6 @@
 package com.promptoven.chatservice.document;
 
 import com.promptoven.chatservice.global.common.entity.BaseEntity;
-import java.time.LocalDateTime;
-import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

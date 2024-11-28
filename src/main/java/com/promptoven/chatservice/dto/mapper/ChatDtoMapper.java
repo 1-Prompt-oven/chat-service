@@ -5,11 +5,14 @@ import com.promptoven.chatservice.document.ChatRoomDocument;
 import com.promptoven.chatservice.dto.in.ChatRoomDto;
 import com.promptoven.chatservice.dto.in.CreateRoomRequestDto;
 import com.promptoven.chatservice.dto.in.SendMessageDto;
+import com.promptoven.chatservice.dto.out.ChatMessageResponseDto;
 import com.promptoven.chatservice.dto.out.CreateRoomResponseDto;
+import com.promptoven.chatservice.vo.out.ChatMessageResponseVo;
 import com.promptoven.chatservice.vo.out.CreateRoomResponseVo;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 
 @Component
 public class ChatDtoMapper {
@@ -48,5 +51,19 @@ public class ChatDtoMapper {
                 .message(sendMessageDto.getMessage())
                 .senderUuid(sendMessageDto.getSenderUuid())
                 .build();
+    }
+
+    public Flux<ChatMessageResponseVo> toChatMessageResponseVo(Flux<ChatMessageResponseDto> chatMessageResponseDtoFlux) {
+        return chatMessageResponseDtoFlux.map(chatMessageDocument ->
+                ChatMessageResponseVo.builder()
+                        .id(chatMessageDocument.getId())
+                        .roomId(chatMessageDocument.getRoomId())
+                        .messageType(chatMessageDocument.getMessageType())
+                        .message(chatMessageDocument.getMessage())
+                        .senderUuid(chatMessageDocument.getSenderUuid())
+                        .createdAt(chatMessageDocument.getCreatedAt())
+                        .updatedAt(chatMessageDocument.getUpdatedAt())
+                        .build()
+        );
     }
 }

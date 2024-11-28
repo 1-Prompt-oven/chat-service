@@ -1,17 +1,21 @@
 package com.promptoven.chatservice.document;
 
-import com.promptoven.chatservice.global.common.entity.BaseEntity;
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
 @Document(collection = "chatMessage")
+@Builder
 @NoArgsConstructor
-public class ChatMessageDocument extends BaseEntity {
+@AllArgsConstructor
+public class ChatMessageDocument {
 
     @Id
     private String id;
@@ -20,12 +24,10 @@ public class ChatMessageDocument extends BaseEntity {
     private String message;
     private String senderUuid;
 
-    @Builder
-    public ChatMessageDocument(String id, String roomId, String messageType, String message, String senderUuid) {
-        this.id = id;
-        this.roomId = roomId;
-        this.messageType = messageType;
-        this.message = message;
-        this.senderUuid = senderUuid;
-    }
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
+
 }
