@@ -1,6 +1,5 @@
 package com.promptoven.chatservice.dto.in;
 
-import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

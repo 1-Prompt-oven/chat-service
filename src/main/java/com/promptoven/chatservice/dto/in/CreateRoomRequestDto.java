@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class CreateRoomRequestDto {
+
     private String hostUserUuid;
     private String inviteUserUuid;
     private String roomName;

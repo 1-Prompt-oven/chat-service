@@ -3,21 +3,27 @@ package com.promptoven.chatservice.presentation;
 import com.promptoven.chatservice.application.ChatService;
 import com.promptoven.chatservice.document.ChatMessageDocument;
 import com.promptoven.chatservice.dto.in.CreateRoomRequestDto;
+import com.promptoven.chatservice.dto.in.PrevMessageRequestDto;
 import com.promptoven.chatservice.dto.mapper.ChatDtoMapper;
+import com.promptoven.chatservice.dto.out.ChatMessageResponseDto;
 import com.promptoven.chatservice.global.common.response.BaseResponse;
+import com.promptoven.chatservice.global.common.utils.CursorPage;
 import com.promptoven.chatservice.vo.in.CreateRoomRequestVo;
 import com.promptoven.chatservice.vo.in.SendMessageVo;
 import com.promptoven.chatservice.vo.mapper.ChatVoMapper;
+import com.promptoven.chatservice.vo.out.ChatMessageResponseVo;
 import com.promptoven.chatservice.vo.out.CreateRoomResponseVo;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
-@Slf4j
 @RestController
 @RequestMapping("/v1/member/chat")
 @RequiredArgsConstructor
@@ -38,7 +44,34 @@ public class ChatController {
 
     @PostMapping("/send")
     public Mono<ChatMessageDocument> sendChatMessage(@RequestBody SendMessageVo sendMessageVo) {
-        log.info("sendMessageVo: {}", sendMessageVo);
+
         return chatService.sendMessage(chatVoMapper.toSendMessageDto(sendMessageVo));
+    }
+
+    @GetMapping(value = "/previous/{roomId}")
+    public BaseResponse<CursorPage<ChatMessageResponseVo>> getChatByRoomId(@PathVariable String roomId,
+            @RequestParam(required = false) String lastObjectId, @RequestParam(required = false) Integer pageSize,
+            @RequestParam(required = false) Integer page) {
+
+        CursorPage<ChatMessageResponseDto> prevMessages = chatService.getPrevMessages(PrevMessageRequestDto.builder()
+                .roomId(roomId)
+                .lastObjectId(lastObjectId)
+                .pageSize(pageSize)
+                .page(page)
+                .build());
+
+        List<ChatMessageResponseVo> chatMessageResponseVoList = prevMessages.getContent().stream()
+                .map(chatDtoMapper::toChatMessageResponseVo)
+                .toList();
+
+        CursorPage<ChatMessageResponseVo> chatMessageResponseVoCursorPage = CursorPage.<ChatMessageResponseVo>builder()
+                .content(chatMessageResponseVoList)
+                .lastObjectId(prevMessages.getLastObjectId())
+                .hasNext(prevMessages.getHasNext())
+                .pageSize(prevMessages.getPageSize())
+                .page(prevMessages.getPage())
+                .build();
+
+        return new BaseResponse<>(chatMessageResponseVoCursorPage);
     }
 }
