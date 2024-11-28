@@ -4,7 +4,6 @@ import com.promptoven.chatservice.dto.in.CreateRoomRequestDto;
 import com.promptoven.chatservice.dto.in.SendMessageDto;
 import com.promptoven.chatservice.vo.in.CreateRoomRequestVo;
 import com.promptoven.chatservice.vo.in.SendMessageVo;
-import com.promptoven.chatservice.vo.out.CreateRoomResponseVo;
 import org.springframework.stereotype.Component;
 
 @Component

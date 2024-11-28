@@ -7,7 +7,6 @@ import com.promptoven.chatservice.dto.out.ChatMessageResponseDto;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.ChangeStreamEvent;
@@ -18,7 +17,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChatMessageServiceImpl implements ChatMessageService {
@@ -29,8 +27,6 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     @Override
     public Flux<ChatMessageResponseDto> getMessageByRoomId(String roomId) {
 
-        log.info("getNewChatMessageByRoomId: roomId={}", roomId);
-
         ChangeStreamOptions options = ChangeStreamOptions.builder()
                 .filter(Aggregation.newAggregation(
                         Aggregation.match(Criteria.where("operationType").is(OperationType.INSERT.getValue())),
@@ -39,15 +35,13 @@ public class ChatMessageServiceImpl implements ChatMessageService {
                 ))
                 .build();
 
-        log.info("options: {}", options);
-
         return chatFluxMapper.toChatMessageResponseDto(
                 reactiveMongoTemplate.changeStream("chatMessage", options, Document.class)
                         .map(ChangeStreamEvent::getBody)
                         .map(document -> ChatMessageDocument.builder()
                                 .id(document.get("_id", ObjectId.class).toString())
                                 .roomId(document.getString("roomId"))
-                                .senderUuid(document.getString("senderId"))
+                                .senderUuid(document.getString("senderUuid"))
                                 .messageType(document.getString("messageType"))
                                 .message(document.getString("message"))
                                 .createdAt(LocalDateTime.ofInstant(document.getDate("createdAt").toInstant(),

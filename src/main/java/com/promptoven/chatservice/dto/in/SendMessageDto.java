@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class SendMessageDto {
+
     private String roomId;
     private String messageType;
     private String message;

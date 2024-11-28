@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class CreateRoomResponseVo {
+
     private String roomId;
     private String roomName;
     private LocalDateTime createdAt;
