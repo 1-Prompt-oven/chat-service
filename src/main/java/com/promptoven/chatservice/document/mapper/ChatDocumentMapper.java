@@ -4,6 +4,7 @@ import com.promptoven.chatservice.document.ChatMessageDocument;
 import com.promptoven.chatservice.document.ChatRoomDocument;
 import com.promptoven.chatservice.dto.out.ChatMessageResponseDto;
 import com.promptoven.chatservice.dto.out.CreateRoomResponseDto;
+import com.promptoven.chatservice.dto.out.GetChatRoomResponseDto;
 import org.springframework.stereotype.Component;
 
 @Component

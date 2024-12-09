@@ -2,13 +2,14 @@ package com.promptoven.chatservice.dto.mapper;
 
 import com.promptoven.chatservice.document.ChatMessageDocument;
 import com.promptoven.chatservice.document.ChatRoomDocument;
-import com.promptoven.chatservice.dto.in.ChatRoomDto;
 import com.promptoven.chatservice.dto.in.CreateRoomRequestDto;
 import com.promptoven.chatservice.dto.in.SendMessageDto;
 import com.promptoven.chatservice.dto.out.ChatMessageResponseDto;
 import com.promptoven.chatservice.dto.out.CreateRoomResponseDto;
+import com.promptoven.chatservice.dto.out.GetChatRoomResponseDto;
 import com.promptoven.chatservice.vo.out.ChatMessageResponseVo;
 import com.promptoven.chatservice.vo.out.CreateRoomResponseVo;
+import com.promptoven.chatservice.vo.out.GetChatRoomResponseVo;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
@@ -17,19 +18,11 @@ public class ChatDtoMapper {
 
     // 매개는 항상 Dto (ex Dto -> Dto / Dto -> Vo)
 
-    public ChatRoomDto toChatRoomDto(CreateRoomRequestDto createRoomRequestDto) {
-        return ChatRoomDto.builder()
+    public ChatRoomDocument toChatRoomDocument(CreateRoomRequestDto createRoomRequestDto) {
+        return ChatRoomDocument.builder()
                 .chatRoomName(createRoomRequestDto.getRoomName())
                 .hostUserUuid(createRoomRequestDto.getHostUserUuid())
                 .inviteUserUuid(createRoomRequestDto.getInviteUserUuid())
-                .build();
-    }
-
-    public ChatRoomDocument toChatRoomDocument(ChatRoomDto chatRoomDto) {
-        return ChatRoomDocument.builder()
-                .chatRoomName(chatRoomDto.getChatRoomName())
-                .hostUserUuid(chatRoomDto.getHostUserUuid())
-                .inviteUserUuid(chatRoomDto.getInviteUserUuid())
                 .build();
     }
 
@@ -75,6 +68,13 @@ public class ChatDtoMapper {
                 .senderUuid(chatMessageResponseDto.getSenderUuid())
                 .createdAt(chatMessageResponseDto.getCreatedAt())
                 .updatedAt(chatMessageResponseDto.getUpdatedAt())
+                .build();
+    }
+
+    public GetChatRoomResponseVo toGetChatRoomResponseVo(GetChatRoomResponseDto getChatRoomResponseDto) {
+        return GetChatRoomResponseVo.builder()
+                .chatRoomName(getChatRoomResponseDto.getChatRoomName())
+                .partnerUuid(getChatRoomResponseDto.getPartnerUuid())
                 .build();
     }
 
