@@ -1,11 +1,9 @@
 spring:
   application:
     name: chat-service
-  profiles:
-    active: local
   data:
     mongodb:
-      uri: mongodb://root:1234@mongodb:27019/chatDB?directConnection=true
+      uri: mongodb+srv://1630202:minjihun@promptoven.5ld4d.mongodb.net/promptoven?retryWrites=true&w=majority&appName=promptoven
 
 springdoc:
   api-docs:
@@ -13,7 +11,7 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     operations-sorter: alpha
-  packages-to-scan: com.promptoven.chatservice  # ??? ??? ??
+  packages-to-scan: com.promptoven.chatservice  # 스캔할 패키지 명시
   default-produces-media-type: application/json
   default-consumes-media-type: application/json
 
@@ -56,18 +54,16 @@ spring:
       on-profile: prod
   jpa:
     hibernate:
-      ddl-auto: update  # prod ????? validate ??
+      ddl-auto: update  # prod 환경에서는 validate 권장
     show-sql: true
     properties:
       dialect: org.hibernate.dialect.MySQLDialect
   data:
     mongodb:
-      uri: mongodb://root:1234@mongodb:27017/reviewDB?directConnection=true
-  kafka:
-    text-bootstrap-servers: kafka-1:9092,kafka-2:9092,kafka-3:9092
+      uri: mongodb+srv://1630202:minjihun@promptoven.5ld4d.mongodb.net/promptoven?retryWrites=true&w=majority&appName=promptoven
   cloud:
     config:
-      name: review-read-service,eventTopic
+      name: chat-service,eventTopic
       fail-fast: false
 
 eureka:
