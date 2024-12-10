@@ -13,8 +13,6 @@ public interface ChatService {
 
     CreateRoomResponseDto createChatRoom(CreateRoomRequestDto createRoomRequestDto);
 
-    Mono<ChatMessageDocument> sendMessage(SendMessageDto sendMessageDto);
-
     CursorPage<ChatMessageResponseDto> getPrevMessages(PrevMessageRequestDto prevMessageRequestDto);
 }
 

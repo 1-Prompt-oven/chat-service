@@ -19,6 +19,7 @@ public class ChatFluxMapper {
                         .messageType(chatMessageEntity.getMessageType())
                         .message(chatMessageEntity.getMessage())
                         .senderUuid(chatMessageEntity.getSenderUuid())
+                        .isRead(chatMessageEntity.getIsRead())
                         .createdAt(chatMessageEntity.getCreatedAt())
                         .updatedAt(chatMessageEntity.getUpdatedAt())
                         .build()
@@ -34,6 +35,7 @@ public class ChatFluxMapper {
                         .messageType(chatMessageDocument.getMessageType())
                         .message(chatMessageDocument.getMessage())
                         .senderUuid(chatMessageDocument.getSenderUuid())
+                        .isRead(chatMessageDocument.getIsRead())
                         .createdAt(chatMessageDocument.getCreatedAt())
                         .updatedAt(chatMessageDocument.getUpdatedAt())
                         .build()
@@ -48,6 +50,7 @@ public class ChatFluxMapper {
                         .partnerUuid(chatRoomResponseDto.getPartnerUuid())
                         .recentMessage(chatRoomResponseDto.getRecentMessage())
                         .recentMessageTime(chatRoomResponseDto.getRecentMessageTime())
+                        .unreadCount(chatRoomResponseDto.getUnreadCount())
                         .build()
         );
     }

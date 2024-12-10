@@ -36,11 +36,6 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public Mono<ChatMessageDocument> sendMessage(SendMessageDto sendMessageDto) {
-        return mongoChatMessageRepository.save(chatDtoMapper.toChatMessageDocument(sendMessageDto));
-    }
-
-    @Override
     public CursorPage<ChatMessageResponseDto> getPrevMessages(PrevMessageRequestDto prevMessageRequestDto) {
         return mongoCustomChatRepository.getPrevMessages(prevMessageRequestDto);
     }
