@@ -6,7 +6,6 @@ import com.promptoven.chatservice.dto.in.CreateRoomRequestDto;
 import com.promptoven.chatservice.dto.in.PrevMessageRequestDto;
 import com.promptoven.chatservice.dto.mapper.ChatDtoMapper;
 import com.promptoven.chatservice.dto.out.ChatMessageResponseDto;
-import com.promptoven.chatservice.dto.out.GetChatRoomResponseDto;
 import com.promptoven.chatservice.global.common.response.BaseResponse;
 import com.promptoven.chatservice.global.common.utils.CursorPage;
 import com.promptoven.chatservice.vo.in.CreateRoomRequestVo;
@@ -14,7 +13,6 @@ import com.promptoven.chatservice.vo.in.SendMessageVo;
 import com.promptoven.chatservice.vo.mapper.ChatVoMapper;
 import com.promptoven.chatservice.vo.out.ChatMessageResponseVo;
 import com.promptoven.chatservice.vo.out.CreateRoomResponseVo;
-import com.promptoven.chatservice.vo.out.GetChatRoomResponseVo;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -77,13 +75,4 @@ public class ChatController {
         return new BaseResponse<>(chatMessageResponseVoCursorPage);
     }
 
-    @GetMapping(value = "/chatRoomList/{userUuid}")
-    public BaseResponse<List<GetChatRoomResponseVo>> getChatRoomList(@PathVariable String userUuid) {
-        List<GetChatRoomResponseDto> chatRoomResponseDtoList = chatService.getChatRoomList(userUuid);
-        List<GetChatRoomResponseVo> chatRoomResponseVoList = chatRoomResponseDtoList.stream()
-                .map(chatDtoMapper::toGetChatRoomResponseVo)
-                .toList();
-
-        return new BaseResponse<>(chatRoomResponseVoList);
-    }
 }

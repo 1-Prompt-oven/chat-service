@@ -6,12 +6,9 @@ import com.promptoven.chatservice.dto.in.CreateRoomRequestDto;
 import com.promptoven.chatservice.dto.in.SendMessageDto;
 import com.promptoven.chatservice.dto.out.ChatMessageResponseDto;
 import com.promptoven.chatservice.dto.out.CreateRoomResponseDto;
-import com.promptoven.chatservice.dto.out.GetChatRoomResponseDto;
 import com.promptoven.chatservice.vo.out.ChatMessageResponseVo;
 import com.promptoven.chatservice.vo.out.CreateRoomResponseVo;
-import com.promptoven.chatservice.vo.out.GetChatRoomResponseVo;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Flux;
 
 @Component
 public class ChatDtoMapper {
@@ -44,21 +41,6 @@ public class ChatDtoMapper {
                 .build();
     }
 
-    public Flux<ChatMessageResponseVo> toChatMessageResponseVo(
-            Flux<ChatMessageResponseDto> chatMessageResponseDtoFlux) {
-        return chatMessageResponseDtoFlux.map(chatMessageDocument ->
-                ChatMessageResponseVo.builder()
-                        .id(chatMessageDocument.getId())
-                        .roomId(chatMessageDocument.getRoomId())
-                        .messageType(chatMessageDocument.getMessageType())
-                        .message(chatMessageDocument.getMessage())
-                        .senderUuid(chatMessageDocument.getSenderUuid())
-                        .createdAt(chatMessageDocument.getCreatedAt())
-                        .updatedAt(chatMessageDocument.getUpdatedAt())
-                        .build()
-        );
-    }
-
     public ChatMessageResponseVo toChatMessageResponseVo(ChatMessageResponseDto chatMessageResponseDto) {
         return ChatMessageResponseVo.builder()
                 .id(chatMessageResponseDto.getId())
@@ -70,12 +52,4 @@ public class ChatDtoMapper {
                 .updatedAt(chatMessageResponseDto.getUpdatedAt())
                 .build();
     }
-
-    public GetChatRoomResponseVo toGetChatRoomResponseVo(GetChatRoomResponseDto getChatRoomResponseDto) {
-        return GetChatRoomResponseVo.builder()
-                .chatRoomName(getChatRoomResponseDto.getChatRoomName())
-                .partnerUuid(getChatRoomResponseDto.getPartnerUuid())
-                .build();
-    }
-
 }

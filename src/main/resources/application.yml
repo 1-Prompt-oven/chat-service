@@ -5,7 +5,7 @@ spring:
     active: local
   data:
     mongodb:
-      uri: mongodb://root:1234@mongodb:27017/chatDB?directConnection=true
+      uri: mongodb://root:1234@mongodb:27019/chatDB?directConnection=true
 
 springdoc:
   api-docs:
@@ -34,7 +34,7 @@ spring:
     name: chat-service
   data:
     mongodb:
-      uri: mongodb://localhost:27018/chatDB?directConnection=true
+      uri: mongodb://localhost:27019/chatDB?directConnection=true
 
 eureka:
   instance:
