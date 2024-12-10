@@ -25,6 +25,7 @@ public class ChatDocumentMapper {
                 .senderUuid(chatMessageDocument.getSenderUuid())
                 .messageType(chatMessageDocument.getMessageType())
                 .message(chatMessageDocument.getMessage())
+                .isRead(chatMessageDocument.getIsRead())
                 .createdAt(chatMessageDocument.getCreatedAt())
                 .updatedAt(chatMessageDocument.getUpdatedAt())
                 .build();

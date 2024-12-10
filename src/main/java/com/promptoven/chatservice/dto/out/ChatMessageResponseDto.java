@@ -14,17 +14,19 @@ public class ChatMessageResponseDto {
     private String messageType;
     private String message;
     private String senderUuid;
+    private Boolean isRead;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     @Builder
-    public ChatMessageResponseDto(String id, String roomId, String messageType, String message, String senderUuid,
+    public ChatMessageResponseDto(String id, String roomId, String messageType, String message, String senderUuid, Boolean isRead,
             LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.roomId = roomId;
         this.messageType = messageType;
         this.message = message;
         this.senderUuid = senderUuid;
+        this.isRead = isRead;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }

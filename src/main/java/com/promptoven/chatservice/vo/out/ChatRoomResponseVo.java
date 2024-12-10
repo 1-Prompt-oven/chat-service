@@ -17,4 +17,5 @@ public class ChatRoomResponseVo {
     private String partnerUuid;
     private String recentMessage;
     private LocalDateTime recentMessageTime;
+    private Long unreadCount;
 }

@@ -20,6 +20,7 @@ public class ChatDtoMapper {
                 .chatRoomName(createRoomRequestDto.getRoomName())
                 .hostUserUuid(createRoomRequestDto.getHostUserUuid())
                 .inviteUserUuid(createRoomRequestDto.getInviteUserUuid())
+                .unreadCount(0L)
                 .build();
     }
 
@@ -38,6 +39,7 @@ public class ChatDtoMapper {
                 .messageType(sendMessageDto.getMessageType())
                 .message(sendMessageDto.getMessage())
                 .senderUuid(sendMessageDto.getSenderUuid())
+                .isRead(false)
                 .build();
     }
 
@@ -48,6 +50,7 @@ public class ChatDtoMapper {
                 .messageType(chatMessageResponseDto.getMessageType())
                 .message(chatMessageResponseDto.getMessage())
                 .senderUuid(chatMessageResponseDto.getSenderUuid())
+                .isRead(chatMessageResponseDto.getIsRead())
                 .createdAt(chatMessageResponseDto.getCreatedAt())
                 .updatedAt(chatMessageResponseDto.getUpdatedAt())
                 .build();
