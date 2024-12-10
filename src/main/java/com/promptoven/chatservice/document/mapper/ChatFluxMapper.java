@@ -2,6 +2,9 @@ package com.promptoven.chatservice.document.mapper;
 
 import com.promptoven.chatservice.document.ChatMessageDocument;
 import com.promptoven.chatservice.dto.out.ChatMessageResponseDto;
+import com.promptoven.chatservice.dto.out.ChatRoomResponseDto;
+import com.promptoven.chatservice.vo.out.ChatMessageResponseVo;
+import com.promptoven.chatservice.vo.out.ChatRoomResponseVo;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
@@ -18,6 +21,33 @@ public class ChatFluxMapper {
                         .senderUuid(chatMessageEntity.getSenderUuid())
                         .createdAt(chatMessageEntity.getCreatedAt())
                         .updatedAt(chatMessageEntity.getUpdatedAt())
+                        .build()
+        );
+    }
+
+    public Flux<ChatMessageResponseVo> toChatMessageResponseVo(
+            Flux<ChatMessageResponseDto> chatMessageResponseDtoFlux) {
+        return chatMessageResponseDtoFlux.map(chatMessageDocument ->
+                ChatMessageResponseVo.builder()
+                        .id(chatMessageDocument.getId())
+                        .roomId(chatMessageDocument.getRoomId())
+                        .messageType(chatMessageDocument.getMessageType())
+                        .message(chatMessageDocument.getMessage())
+                        .senderUuid(chatMessageDocument.getSenderUuid())
+                        .createdAt(chatMessageDocument.getCreatedAt())
+                        .updatedAt(chatMessageDocument.getUpdatedAt())
+                        .build()
+        );
+    }
+
+    public Flux<ChatRoomResponseVo> toChatRoomResponseVo(Flux<ChatRoomResponseDto> chatRoomResponseDtoFlux) {
+        return chatRoomResponseDtoFlux.map(chatRoomResponseDto ->
+                ChatRoomResponseVo.builder()
+                        .chatRoomId(chatRoomResponseDto.getChatRoomId())
+                        .chatRoomName(chatRoomResponseDto.getChatRoomName())
+                        .partnerUuid(chatRoomResponseDto.getPartnerUuid())
+                        .recentMessage(chatRoomResponseDto.getRecentMessage())
+                        .recentMessageTime(chatRoomResponseDto.getRecentMessageTime())
                         .build()
         );
     }

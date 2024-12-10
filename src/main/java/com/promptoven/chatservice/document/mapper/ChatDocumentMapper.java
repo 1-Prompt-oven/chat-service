@@ -23,6 +23,7 @@ public class ChatDocumentMapper {
                 .id(chatMessageDocument.getId())
                 .roomId(chatMessageDocument.getRoomId())
                 .senderUuid(chatMessageDocument.getSenderUuid())
+                .messageType(chatMessageDocument.getMessageType())
                 .message(chatMessageDocument.getMessage())
                 .createdAt(chatMessageDocument.getCreatedAt())
                 .updatedAt(chatMessageDocument.getUpdatedAt())
