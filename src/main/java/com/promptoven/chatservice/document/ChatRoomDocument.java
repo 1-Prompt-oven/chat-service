@@ -1,6 +1,7 @@
 package com.promptoven.chatservice.document;
 
 import com.promptoven.chatservice.global.common.entity.BaseEntity;
+import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,12 +18,17 @@ public class ChatRoomDocument extends BaseEntity {
     private String chatRoomName;
     private String hostUserUuid;
     private String inviteUserUuid;
+    private String recentMessage;
+    private LocalDateTime recentMessageTime;
 
     @Builder
-    public ChatRoomDocument(String id, String chatRoomName, String hostUserUuid, String inviteUserUuid) {
+    public ChatRoomDocument(String id, String chatRoomName, String hostUserUuid, String inviteUserUuid,
+            String recentMessage, LocalDateTime recentMessageTime) {
         this.id = id;
         this.chatRoomName = chatRoomName;
         this.hostUserUuid = hostUserUuid;
         this.inviteUserUuid = inviteUserUuid;
+        this.recentMessage = recentMessage;
+        this.recentMessageTime = recentMessageTime;
     }
 }

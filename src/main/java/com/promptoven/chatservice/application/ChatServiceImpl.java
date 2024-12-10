@@ -30,8 +30,7 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public CreateRoomResponseDto createChatRoom(CreateRoomRequestDto createRoomRequestDto) {
 
-        ChatRoomDocument chatRoomDocument = chatDtoMapper.toChatRoomDocument(
-                chatDtoMapper.toChatRoomDto(createRoomRequestDto));
+        ChatRoomDocument chatRoomDocument = chatDtoMapper.toChatRoomDocument(createRoomRequestDto);
 
         return chatDocumentMapper.toCreateRoomResponseDto(mongoChatRepository.save(chatRoomDocument));
     }
@@ -45,4 +44,5 @@ public class ChatServiceImpl implements ChatService {
     public CursorPage<ChatMessageResponseDto> getPrevMessages(PrevMessageRequestDto prevMessageRequestDto) {
         return mongoCustomChatRepository.getPrevMessages(prevMessageRequestDto);
     }
+
 }

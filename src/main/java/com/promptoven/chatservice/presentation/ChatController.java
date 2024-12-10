@@ -74,4 +74,5 @@ public class ChatController {
 
         return new BaseResponse<>(chatMessageResponseVoCursorPage);
     }
+
 }
