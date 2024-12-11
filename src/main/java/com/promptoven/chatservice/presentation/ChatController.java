@@ -16,6 +16,7 @@ import com.promptoven.chatservice.vo.out.ChatMessageResponseVo;
 import com.promptoven.chatservice.vo.out.CreateRoomResponseVo;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -80,5 +81,9 @@ public class ChatController {
     @PutMapping("/updateRead/{roomId}")
     public Mono<Void> updateRead(@PathVariable String roomId, @RequestParam String userUuid) {
         return chatReactiveService.updateRead(roomId, userUuid);
+    }
+    @DeleteMapping("/{roomId}")
+    public Mono<Void> leaveChatRoom(@PathVariable String roomId, @RequestParam String userUuid) {
+        return chatReactiveService.leaveChatRoom(roomId, userUuid);
     }
 }

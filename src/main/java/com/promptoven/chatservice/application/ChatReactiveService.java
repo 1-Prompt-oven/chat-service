@@ -16,4 +16,6 @@ public interface ChatReactiveService {
     Flux<ChatRoomResponseDto> getChatRoomList(String userUuid);
 
     Mono<Void> updateRead(String roomId, String userUuid);
+  
+    Mono<Void> leaveChatRoom(String roomId, String userUuid);
 }

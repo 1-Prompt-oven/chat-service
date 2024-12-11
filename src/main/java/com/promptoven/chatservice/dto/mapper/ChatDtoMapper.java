@@ -8,6 +8,7 @@ import com.promptoven.chatservice.dto.out.ChatMessageResponseDto;
 import com.promptoven.chatservice.dto.out.CreateRoomResponseDto;
 import com.promptoven.chatservice.vo.out.ChatMessageResponseVo;
 import com.promptoven.chatservice.vo.out.CreateRoomResponseVo;
+import java.util.List;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,10 +17,22 @@ public class ChatDtoMapper {
     // 매개는 항상 Dto (ex Dto -> Dto / Dto -> Vo)
 
     public ChatRoomDocument toChatRoomDocument(CreateRoomRequestDto createRoomRequestDto) {
+        List<ChatRoomDocument.Participant> participants = List.of(
+                ChatRoomDocument.Participant.builder()
+                        .userUuid(createRoomRequestDto.getHostUserUuid()) // 방 생성자
+                        .status("active") // 활성 상태
+                        .leftAt(null) // 나간 시간 없음
+                        .build(),
+                ChatRoomDocument.Participant.builder()
+                        .userUuid(createRoomRequestDto.getInviteUserUuid()) // 초대된 사용자
+                        .status("active") // 활성 상태
+                        .leftAt(null) // 나간 시간 없음
+                        .build()
+        );
+
         return ChatRoomDocument.builder()
                 .chatRoomName(createRoomRequestDto.getRoomName())
-                .hostUserUuid(createRoomRequestDto.getHostUserUuid())
-                .inviteUserUuid(createRoomRequestDto.getInviteUserUuid())
+                .participants(participants)
                 .unreadCount(0L)
                 .build();
     }
