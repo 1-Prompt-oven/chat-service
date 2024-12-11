@@ -48,6 +48,7 @@ public class ChatFluxMapper {
                         .chatRoomId(chatRoomResponseDto.getChatRoomId())
                         .chatRoomName(chatRoomResponseDto.getChatRoomName())
                         .partnerUuid(chatRoomResponseDto.getPartnerUuid())
+                        .partnerIsActive(chatRoomResponseDto.getPartnerIsActive())
                         .recentMessage(chatRoomResponseDto.getRecentMessage())
                         .recentMessageTime(chatRoomResponseDto.getRecentMessageTime())
                         .unreadCount(chatRoomResponseDto.getUnreadCount())
