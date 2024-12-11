@@ -1,11 +1,15 @@
 package com.promptoven.chatservice.application;
 
+import com.mongodb.client.model.changestream.FullDocument;
 import com.mongodb.client.model.changestream.OperationType;
 import com.promptoven.chatservice.document.ChatMessageDocument;
 import com.promptoven.chatservice.document.ChatRoomDocument;
 import com.promptoven.chatservice.document.mapper.ChatFluxMapper;
+import com.promptoven.chatservice.dto.in.SendMessageDto;
+import com.promptoven.chatservice.dto.mapper.ChatDtoMapper;
 import com.promptoven.chatservice.dto.out.ChatMessageResponseDto;
 import com.promptoven.chatservice.dto.out.ChatRoomResponseDto;
+import com.promptoven.chatservice.infrastructure.MongoChatMessageRepository;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import lombok.RequiredArgsConstructor;
@@ -29,17 +33,23 @@ import reactor.core.publisher.Mono;
 public class ChatReactiveServiceImpl implements ChatReactiveService {
 
     private final ChatFluxMapper chatFluxMapper;
+    private final ChatDtoMapper chatDtoMapper;
+    private final MongoChatMessageRepository mongoChatMessageRepository;
     private final ReactiveMongoTemplate reactiveMongoTemplate;
 
+    // 채팅 내역 실시간으로 받아오는 로직
     @Override
     public Flux<ChatMessageResponseDto> getMessageByRoomId(String roomId) {
 
         ChangeStreamOptions options = ChangeStreamOptions.builder()
                 .filter(Aggregation.newAggregation(
-                        Aggregation.match(Criteria.where("operationType").is(OperationType.INSERT.getValue())),
-                        // 새로운 데이터가 삽입될 때
-                        Aggregation.match(Criteria.where("fullDocument.roomId").is(roomId)) // 해당 roomId와 일치하는 데이터만
+                        Aggregation.match(Criteria.where("operationType").in(
+                                OperationType.INSERT.getValue(),
+                                OperationType.UPDATE.getValue()
+                        )),
+                        Aggregation.match(Criteria.where("fullDocument.roomId").is(roomId))
                 ))
+                .fullDocumentLookup(FullDocument.UPDATE_LOOKUP) // 변경된 문서 전체 조회
                 .build();
 
         return chatFluxMapper.toChatMessageResponseDto(
@@ -51,6 +61,7 @@ public class ChatReactiveServiceImpl implements ChatReactiveService {
                                 .senderUuid(document.getString("senderUuid"))
                                 .messageType(document.getString("messageType"))
                                 .message(document.getString("message"))
+                                .isRead(document.getBoolean("isRead"))
                                 .createdAt(LocalDateTime.ofInstant(document.getDate("createdAt").toInstant(),
                                         ZoneId.systemDefault()))
                                 .updatedAt(LocalDateTime.ofInstant(document.getDate("updatedAt").toInstant(),
@@ -60,69 +71,102 @@ public class ChatReactiveServiceImpl implements ChatReactiveService {
         );
     }
 
+    // 채팅 목록 실시간으로 받아오는 로직
     @Override
     public Flux<ChatRoomResponseDto> getChatRoomList(String userUuid) {
-        Flux<ChatRoomResponseDto> initialData = reactiveMongoTemplate.find(
+
+        Flux<ChatRoomResponseDto> initialData = getInitialChatRooms(userUuid);
+
+        ChangeStreamOptions options = ChangeStreamOptions.builder()
+                .filter(Aggregation.newAggregation(
+                        Aggregation.match(Criteria.where("operationType").in(
+                                OperationType.INSERT.getValue(),
+                                OperationType.UPDATE.getValue()
+                        ))
+                ))
+                .fullDocumentLookup(FullDocument.UPDATE_LOOKUP) // 변경된 문서 전체 조회
+                .build();
+
+        Flux<ChatRoomResponseDto> updates = reactiveMongoTemplate.changeStream("chat", options, ChatRoomDocument.class)
+                .map(ChangeStreamEvent::getBody)
+                .map(chatRoom -> {
+                    log.info("chatRoom: {}", chatRoom);
+                    String partnerUuid = chatRoom.getHostUserUuid().equals(userUuid)
+                            ? chatRoom.getInviteUserUuid()
+                            : chatRoom.getHostUserUuid();
+
+                    return ChatRoomResponseDto.builder()
+                            .chatRoomId(chatRoom.getId())
+                            .chatRoomName(chatRoom.getChatRoomName())
+                            .recentMessage(chatRoom.getRecentMessage())
+                            .recentMessageTime(chatRoom.getRecentMessageTime())
+                            .partnerUuid(partnerUuid)
+                            .unreadCount(chatRoom.getUnreadCount())
+                            .build();
+                });
+
+        return Flux.concat(initialData, updates);
+    }
+
+    // 채팅 목록 초기 데이터 조회
+    private Flux<ChatRoomResponseDto> getInitialChatRooms(String userUuid) {
+        return reactiveMongoTemplate.find(
                 Query.query(new Criteria().orOperator(
                         Criteria.where("hostUserUuid").is(userUuid),
                         Criteria.where("inviteUserUuid").is(userUuid)
                 )),
                 ChatRoomDocument.class
-        ).map(chatRoom -> {
-            String partnerUuid = chatRoom.getHostUserUuid().equals(userUuid)
-                    ? chatRoom.getInviteUserUuid()
-                    : chatRoom.getHostUserUuid();
-
-            return ChatRoomResponseDto.builder()
-                    .chatRoomId(chatRoom.getId())
-                    .chatRoomName(chatRoom.getChatRoomName())
-                    .recentMessage(chatRoom.getRecentMessage())
-                    .recentMessageTime(chatRoom.getRecentMessageTime())
-                    .partnerUuid(partnerUuid)
-                    .build();
-        });
-
-        ChangeStreamOptions options = ChangeStreamOptions.builder()
-                .filter(Aggregation.newAggregation(
-                        Aggregation.match(Criteria.where("operationType").is(OperationType.INSERT.getValue()))
-                ))
-                .build();
-
-        Flux<ChatRoomResponseDto> updates = reactiveMongoTemplate.changeStream("chatMessage", options, Document.class)
-                .map(ChangeStreamEvent::getBody)
-                .flatMap(document -> {
-                    String chatRoomId = document.getString("roomId");
-                    String message = document.getString("message");
-                    LocalDateTime recentMessageTime = LocalDateTime.ofInstant(
-                            document.getDate("updatedAt").toInstant(),
-                            ZoneId.systemDefault()
-                    );
-
-                    // ChatRoom 업데이트 및 partnerUuid 설정
-                    return updateChatRecentMessage(chatRoomId, message, recentMessageTime)
-                            .flatMap(chatRoom -> {
-                                String partnerUuid = chatRoom.getHostUserUuid().equals(userUuid)
-                                        ? chatRoom.getInviteUserUuid()
-                                        : chatRoom.getHostUserUuid();
-
-                                return Mono.just(ChatRoomResponseDto.builder()
-                                        .chatRoomId(chatRoomId)
-                                        .chatRoomName(chatRoom.getChatRoomName())
-                                        .recentMessage(message)
-                                        .recentMessageTime(recentMessageTime)
-                                        .partnerUuid(partnerUuid)
-                                        .build());
-                            });
-                });
-        return Flux.concat(initialData, updates);
+        ).map(chatRoom -> ChatRoomResponseDto.builder()
+                .chatRoomId(chatRoom.getId())
+                .chatRoomName(chatRoom.getChatRoomName())
+                .recentMessage(chatRoom.getRecentMessage())
+                .recentMessageTime(chatRoom.getRecentMessageTime())
+                .partnerUuid(chatRoom.getHostUserUuid().equals(userUuid)
+                        ? chatRoom.getInviteUserUuid()
+                        : chatRoom.getHostUserUuid()) // partnerUuid 설정
+                .unreadCount(chatRoom.getUnreadCount())
+                .build());
     }
 
-    private Mono<ChatRoomDocument> updateChatRecentMessage(String roomId, String recentMessage,
-            LocalDateTime recentMessageTime) {
+    // 채팅방 읽음 처리
+    @Override
+    public Mono<Void> updateRead(String roomId, String userUuid) {
+        return reactiveMongoTemplate.updateMulti(
+                Query.query(Criteria.where("roomId").is(roomId)
+                        .and("senderUuid").ne(userUuid)
+                        .and("isRead").is(false)), // 상대방이 보낸 읽지 않은 메시지
+                Update.update("isRead", true),
+                ChatMessageDocument.class,
+                "chatMessage"
+        ).then(reactiveMongoTemplate.findAndModify(
+                Query.query(Criteria.where("_id").is(roomId)),
+                new Update().set("unreadCount", 0), // unreadCount 초기화
+                ChatRoomDocument.class,
+                "chat"
+        ).then());
+    }
+
+    // 채팅 메시지 전송
+    @Override
+    public Mono<ChatMessageDocument> sendMessage(SendMessageDto sendMessageDto) {
+        return mongoChatMessageRepository.save(chatDtoMapper.toChatMessageDocument(sendMessageDto))
+                .flatMap(savedMessage ->
+                        updateChatRoomOnMessageSend(
+                                savedMessage.getRoomId(),
+                                savedMessage.getMessage(),
+                                savedMessage.getUpdatedAt()
+                        ).thenReturn(savedMessage)
+                );
+    }
+
+    // 채팅 메시지 전송 시 발생하는 채팅방 업데이트 (읽지않음 수 증가 및 최근 메시지 변경)
+    private Mono<ChatRoomDocument> updateChatRoomOnMessageSend(String roomId, String recentMessage, LocalDateTime recentMessageTime) {
         return reactiveMongoTemplate.findAndModify(
                 Query.query(Criteria.where("_id").is(roomId)),
-                Update.update("recentMessage", recentMessage)
-                        .set("recentMessageTime", recentMessageTime),
+                new Update()
+                        .inc("unreadCount", 1)  // unreadCount 증가
+                        .set("recentMessage", recentMessage)  // recentMessage 업데이트
+                        .set("recentMessageTime", recentMessageTime),  // recentMessageTime 업데이트
                 ChatRoomDocument.class,
                 "chat"
         );

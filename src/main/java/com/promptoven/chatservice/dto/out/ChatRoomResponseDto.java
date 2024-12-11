@@ -19,4 +19,5 @@ public class ChatRoomResponseDto {
     private String partnerUuid;
     private String recentMessage;
     private LocalDateTime recentMessageTime;
+    private Long unreadCount;
 }

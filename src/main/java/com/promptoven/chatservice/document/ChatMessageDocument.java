@@ -23,11 +23,9 @@ public class ChatMessageDocument {
     private String messageType;
     private String message;
     private String senderUuid;
-
+    private Boolean isRead;
     @CreatedDate
     private LocalDateTime createdAt;
-
     @LastModifiedDate
     private LocalDateTime updatedAt;
-
 }

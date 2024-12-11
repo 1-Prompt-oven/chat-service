@@ -1,5 +1,6 @@
 package com.promptoven.chatservice.presentation;
 
+import com.promptoven.chatservice.application.ChatReactiveService;
 import com.promptoven.chatservice.application.ChatService;
 import com.promptoven.chatservice.document.ChatMessageDocument;
 import com.promptoven.chatservice.dto.in.CreateRoomRequestDto;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,6 +32,7 @@ import reactor.core.publisher.Mono;
 public class ChatController {
 
     private final ChatService chatService;
+    private final ChatReactiveService chatReactiveService;
     private final ChatVoMapper chatVoMapper;
     private final ChatDtoMapper chatDtoMapper;
 
@@ -44,8 +47,7 @@ public class ChatController {
 
     @PostMapping("/send")
     public Mono<ChatMessageDocument> sendChatMessage(@RequestBody SendMessageVo sendMessageVo) {
-
-        return chatService.sendMessage(chatVoMapper.toSendMessageDto(sendMessageVo));
+        return chatReactiveService.sendMessage(chatVoMapper.toSendMessageDto(sendMessageVo));
     }
 
     @GetMapping(value = "/previous/{roomId}")
@@ -75,4 +77,8 @@ public class ChatController {
         return new BaseResponse<>(chatMessageResponseVoCursorPage);
     }
 
+    @PutMapping("/updateRead/{roomId}")
+    public Mono<Void> updateRead(@PathVariable String roomId, @RequestParam String userUuid) {
+        return chatReactiveService.updateRead(roomId, userUuid);
+    }
 }

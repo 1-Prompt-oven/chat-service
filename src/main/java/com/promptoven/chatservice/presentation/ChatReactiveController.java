@@ -4,6 +4,7 @@ import com.promptoven.chatservice.application.ChatReactiveService;
 import com.promptoven.chatservice.document.mapper.ChatFluxMapper;
 import com.promptoven.chatservice.dto.out.ChatMessageResponseDto;
 import com.promptoven.chatservice.dto.out.ChatRoomResponseDto;
+import com.promptoven.chatservice.global.common.response.BaseResponse;
 import com.promptoven.chatservice.vo.out.ChatMessageResponseVo;
 import com.promptoven.chatservice.vo.out.ChatRoomResponseVo;
 import lombok.RequiredArgsConstructor;
