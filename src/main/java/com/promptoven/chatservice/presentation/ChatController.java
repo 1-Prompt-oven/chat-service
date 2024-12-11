@@ -82,7 +82,6 @@ public class ChatController {
     public Mono<Void> updateRead(@PathVariable String roomId, @RequestParam String userUuid) {
         return chatReactiveService.updateRead(roomId, userUuid);
     }
-
     @DeleteMapping("/{roomId}")
     public Mono<Void> leaveChatRoom(@PathVariable String roomId, @RequestParam String userUuid) {
         return chatReactiveService.leaveChatRoom(roomId, userUuid);

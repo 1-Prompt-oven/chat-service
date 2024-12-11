@@ -27,6 +27,7 @@ public class ChatRoomDocument extends BaseEntity {
     @Builder
     public ChatRoomDocument(String id, String chatRoomName, String recentMessage, LocalDateTime recentMessageTime,
             Long unreadCount, List<Participant> participants, LocalDateTime createdAt, LocalDateTime updatedAt) {
+
         this.id = id;
         this.chatRoomName = chatRoomName;
         this.recentMessage = recentMessage;
