@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 
 public interface MongoChatRepository extends MongoRepository<ChatRoomDocument, String> {
 
+    Optional<ChatRoomDocument> findByParticipantsContaining(String hostUserUuid, String inviteUserUuid);
 }

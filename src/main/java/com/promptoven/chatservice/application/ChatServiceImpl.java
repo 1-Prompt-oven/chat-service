@@ -35,6 +35,16 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public CreateRoomResponseDto createChatRoom(CreateRoomRequestDto createRoomRequestDto) {
 
+        String hostUserUuid = createRoomRequestDto.getHostUserUuid();
+        String inviteUserUuid = createRoomRequestDto.getInviteUserUuid();
+
+        Optional<ChatRoomDocument> existingRoom = mongoChatRepository.findByParticipantsContaining(hostUserUuid, inviteUserUuid);
+
+        if (existingRoom.isPresent()) {
+            ChatRoomDocument chatRoom = existingRoom.get();
+            return new CreateRoomResponseDto(chatRoom.getId(), chatRoom.getChatRoomName());
+        }
+
         ChatRoomDocument chatRoomDocument = chatDtoMapper.toChatRoomDocument(createRoomRequestDto);
 
         return chatDocumentMapper.toCreateRoomResponseDto(mongoChatRepository.save(chatRoomDocument));

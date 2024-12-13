@@ -21,4 +21,9 @@ public class CreateRoomResponseDto {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+
+    public CreateRoomResponseDto(String id, String chatRoomName) {
+        this.roomId = id;
+        this.roomName = chatRoomName;
+    }
 }
