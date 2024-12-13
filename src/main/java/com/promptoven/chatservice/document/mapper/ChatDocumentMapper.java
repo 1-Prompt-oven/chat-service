@@ -32,7 +32,4 @@ public class ChatDocumentMapper {
                 .build();
     }
 
-    public ChatRoomInfoResponseDto toChatRoomInfoResponseDto(ChatRoomDocument chatRoomDocument) {
-
-    }
 }
