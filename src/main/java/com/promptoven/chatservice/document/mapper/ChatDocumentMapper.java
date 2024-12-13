@@ -3,6 +3,7 @@ package com.promptoven.chatservice.document.mapper;
 import com.promptoven.chatservice.document.ChatMessageDocument;
 import com.promptoven.chatservice.document.ChatRoomDocument;
 import com.promptoven.chatservice.dto.out.ChatMessageResponseDto;
+import com.promptoven.chatservice.dto.out.ChatRoomInfoResponseDto;
 import com.promptoven.chatservice.dto.out.CreateRoomResponseDto;
 import org.springframework.stereotype.Component;
 
@@ -29,5 +30,9 @@ public class ChatDocumentMapper {
                 .createdAt(chatMessageDocument.getCreatedAt())
                 .updatedAt(chatMessageDocument.getUpdatedAt())
                 .build();
+    }
+
+    public ChatRoomInfoResponseDto toChatRoomInfoResponseDto(ChatRoomDocument chatRoomDocument) {
+
     }
 }

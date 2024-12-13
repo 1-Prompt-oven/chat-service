@@ -19,6 +19,8 @@ public enum BaseResponseStatus {
      **/
     SUCCESS(HttpStatus.OK, true, 200, "요청에 성공하였습니다."),
 
+    NO_EXIST_CHAT_ROOM(HttpStatus.NOT_FOUND, false, 2001, "존재하지 않는 채팅방입니다."),
+
     /**
      * 400 : security 에러. 아직 사용 안함.
      */

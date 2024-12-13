@@ -7,12 +7,14 @@ import com.promptoven.chatservice.dto.in.CreateRoomRequestDto;
 import com.promptoven.chatservice.dto.in.PrevMessageRequestDto;
 import com.promptoven.chatservice.dto.mapper.ChatDtoMapper;
 import com.promptoven.chatservice.dto.out.ChatMessageResponseDto;
+import com.promptoven.chatservice.dto.out.ChatRoomInfoResponseDto;
 import com.promptoven.chatservice.global.common.response.BaseResponse;
 import com.promptoven.chatservice.global.common.utils.CursorPage;
 import com.promptoven.chatservice.vo.in.CreateRoomRequestVo;
 import com.promptoven.chatservice.vo.in.SendMessageVo;
 import com.promptoven.chatservice.vo.mapper.ChatVoMapper;
 import com.promptoven.chatservice.vo.out.ChatMessageResponseVo;
+import com.promptoven.chatservice.vo.out.ChatRoomInfoResponseVo;
 import com.promptoven.chatservice.vo.out.CreateRoomResponseVo;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -86,5 +88,11 @@ public class ChatController {
     @DeleteMapping("/{roomId}")
     public Mono<Void> leaveChatRoom(@PathVariable String roomId, @RequestParam String userUuid) {
         return chatReactiveService.leaveChatRoom(roomId, userUuid);
+    }
+
+    @GetMapping("/{roomId}")
+    public BaseResponse<ChatRoomInfoResponseVo> getChatRoom(@PathVariable String roomId, @RequestParam String userUuid) {
+        ChatRoomInfoResponseDto chatRoomInfoResponseDto = chatService.getChatRoomInfo(roomId, userUuid);
+        return new BaseResponse<>(chatDtoMapper.toChatRoomInfoResponseVo(chatRoomInfoResponseDto));
     }
 }

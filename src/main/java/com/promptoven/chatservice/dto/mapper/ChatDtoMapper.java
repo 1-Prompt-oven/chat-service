@@ -5,8 +5,10 @@ import com.promptoven.chatservice.document.ChatRoomDocument;
 import com.promptoven.chatservice.dto.in.CreateRoomRequestDto;
 import com.promptoven.chatservice.dto.in.SendMessageDto;
 import com.promptoven.chatservice.dto.out.ChatMessageResponseDto;
+import com.promptoven.chatservice.dto.out.ChatRoomInfoResponseDto;
 import com.promptoven.chatservice.dto.out.CreateRoomResponseDto;
 import com.promptoven.chatservice.vo.out.ChatMessageResponseVo;
+import com.promptoven.chatservice.vo.out.ChatRoomInfoResponseVo;
 import com.promptoven.chatservice.vo.out.CreateRoomResponseVo;
 import java.util.List;
 import org.springframework.stereotype.Component;
@@ -66,6 +68,15 @@ public class ChatDtoMapper {
                 .isRead(chatMessageResponseDto.getIsRead())
                 .createdAt(chatMessageResponseDto.getCreatedAt())
                 .updatedAt(chatMessageResponseDto.getUpdatedAt())
+                .build();
+    }
+
+    public ChatRoomInfoResponseVo toChatRoomInfoResponseVo(ChatRoomInfoResponseDto chatRoomInfoResponseDto) {
+        return ChatRoomInfoResponseVo.builder()
+                .chatRoomId(chatRoomInfoResponseDto.getChatRoomId())
+                .chatRoomName(chatRoomInfoResponseDto.getChatRoomName())
+                .partnerUuid(chatRoomInfoResponseDto.getPartnerUuid())
+                .partnerIsActive(chatRoomInfoResponseDto.getPartnerIsActive())
                 .build();
     }
 }
