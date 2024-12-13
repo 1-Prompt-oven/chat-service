@@ -77,6 +77,9 @@ public class ChatDtoMapper {
                 .chatRoomName(chatRoomInfoResponseDto.getChatRoomName())
                 .partnerUuid(chatRoomInfoResponseDto.getPartnerUuid())
                 .partnerIsActive(chatRoomInfoResponseDto.getPartnerIsActive())
+                .recentMessage(chatRoomInfoResponseDto.getRecentMessage())
+                .recentMessageTime(chatRoomInfoResponseDto.getRecentMessageTime())
+                .unreadCount(chatRoomInfoResponseDto.getUnreadCount())
                 .build();
     }
 }
