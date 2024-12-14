@@ -1,5 +1,6 @@
 package com.promptoven.chatservice.presentation;
 
+import com.fasterxml.jackson.databind.ser.Serializers.Base;
 import com.promptoven.chatservice.application.ChatReactiveService;
 import com.promptoven.chatservice.application.ChatService;
 import com.promptoven.chatservice.document.ChatMessageDocument;
@@ -8,6 +9,7 @@ import com.promptoven.chatservice.dto.in.PrevMessageRequestDto;
 import com.promptoven.chatservice.dto.mapper.ChatDtoMapper;
 import com.promptoven.chatservice.dto.out.ChatMessageResponseDto;
 import com.promptoven.chatservice.dto.out.ChatRoomInfoResponseDto;
+import com.promptoven.chatservice.dto.out.ChatRoomResponseDto;
 import com.promptoven.chatservice.global.common.response.BaseResponse;
 import com.promptoven.chatservice.global.common.utils.CursorPage;
 import com.promptoven.chatservice.vo.in.CreateRoomRequestVo;
@@ -15,6 +17,7 @@ import com.promptoven.chatservice.vo.in.SendMessageVo;
 import com.promptoven.chatservice.vo.mapper.ChatVoMapper;
 import com.promptoven.chatservice.vo.out.ChatMessageResponseVo;
 import com.promptoven.chatservice.vo.out.ChatRoomInfoResponseVo;
+import com.promptoven.chatservice.vo.out.ChatRoomResponseVo;
 import com.promptoven.chatservice.vo.out.CreateRoomResponseVo;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -94,5 +98,13 @@ public class ChatController {
     public BaseResponse<ChatRoomInfoResponseVo> getChatRoom(@PathVariable String roomId, @RequestParam String userUuid) {
         ChatRoomInfoResponseDto chatRoomInfoResponseDto = chatService.getChatRoomInfo(roomId, userUuid);
         return new BaseResponse<>(chatDtoMapper.toChatRoomInfoResponseVo(chatRoomInfoResponseDto));
+    }
+
+    @GetMapping("/rest/chatRoomList/{userUuid}")
+    public BaseResponse<List<ChatRoomResponseVo>> getChatRoomList(@PathVariable String userUuid) {
+
+        List<ChatRoomResponseDto> chatRoomResponseDtoList = chatService.getChatRoomList(userUuid);
+
+        return new BaseResponse<>(chatDtoMapper.toChatRoomResponseVoList(chatRoomResponseDtoList));
     }
 }

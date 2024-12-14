@@ -6,8 +6,10 @@ import com.promptoven.chatservice.dto.in.PrevMessageRequestDto;
 import com.promptoven.chatservice.dto.in.SendMessageDto;
 import com.promptoven.chatservice.dto.out.ChatMessageResponseDto;
 import com.promptoven.chatservice.dto.out.ChatRoomInfoResponseDto;
+import com.promptoven.chatservice.dto.out.ChatRoomResponseDto;
 import com.promptoven.chatservice.dto.out.CreateRoomResponseDto;
 import com.promptoven.chatservice.global.common.utils.CursorPage;
+import java.util.List;
 import reactor.core.publisher.Mono;
 
 public interface ChatService {
@@ -17,6 +19,8 @@ public interface ChatService {
     CursorPage<ChatMessageResponseDto> getPrevMessages(PrevMessageRequestDto prevMessageRequestDto);
 
     ChatRoomInfoResponseDto getChatRoomInfo(String chatRoomIdm, String userUuid);
+
+    List<ChatRoomResponseDto> getChatRoomList(String userUuid);
 }
 
 

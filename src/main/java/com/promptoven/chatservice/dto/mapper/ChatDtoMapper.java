@@ -6,9 +6,11 @@ import com.promptoven.chatservice.dto.in.CreateRoomRequestDto;
 import com.promptoven.chatservice.dto.in.SendMessageDto;
 import com.promptoven.chatservice.dto.out.ChatMessageResponseDto;
 import com.promptoven.chatservice.dto.out.ChatRoomInfoResponseDto;
+import com.promptoven.chatservice.dto.out.ChatRoomResponseDto;
 import com.promptoven.chatservice.dto.out.CreateRoomResponseDto;
 import com.promptoven.chatservice.vo.out.ChatMessageResponseVo;
 import com.promptoven.chatservice.vo.out.ChatRoomInfoResponseVo;
+import com.promptoven.chatservice.vo.out.ChatRoomResponseVo;
 import com.promptoven.chatservice.vo.out.CreateRoomResponseVo;
 import java.util.List;
 import org.springframework.stereotype.Component;
@@ -81,5 +83,19 @@ public class ChatDtoMapper {
                 .recentMessageTime(chatRoomInfoResponseDto.getRecentMessageTime())
                 .unreadCount(chatRoomInfoResponseDto.getUnreadCount())
                 .build();
+    }
+
+    public List<ChatRoomResponseVo> toChatRoomResponseVoList(List<ChatRoomResponseDto> chatRoomResponseDtoList) {
+        return chatRoomResponseDtoList.stream()
+                .map(chatRoomResponseDto -> ChatRoomResponseVo.builder()
+                        .chatRoomId(chatRoomResponseDto.getChatRoomId())
+                        .chatRoomName(chatRoomResponseDto.getChatRoomName())
+                        .partnerUuid(chatRoomResponseDto.getPartnerUuid())
+                        .partnerIsActive(chatRoomResponseDto.getPartnerIsActive())
+                        .recentMessage(chatRoomResponseDto.getRecentMessage())
+                        .recentMessageTime(chatRoomResponseDto.getRecentMessageTime())
+                        .unreadCount(chatRoomResponseDto.getUnreadCount())
+                        .build())
+                .toList();
     }
 }

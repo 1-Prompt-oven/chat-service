@@ -18,6 +18,7 @@ import com.promptoven.chatservice.global.error.BaseException;
 import com.promptoven.chatservice.infrastructure.MongoChatMessageRepository;
 import com.promptoven.chatservice.infrastructure.MongoChatRepository;
 import com.promptoven.chatservice.infrastructure.MongoCustomChatRepository;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -78,6 +79,31 @@ public class ChatServiceImpl implements ChatService {
                 .recentMessageTime(chatRoomDocument.getRecentMessageTime())
                 .unreadCount(chatRoomDocument.getUnreadCount())
                 .build();
+    }
+
+    @Override
+    public List<ChatRoomResponseDto> getChatRoomList(String userUuid) {
+
+        List<ChatRoomDocument> chatRoomDocumentList = mongoChatRepository.findByParticipantUserUuid(userUuid);
+
+        return chatRoomDocumentList.stream()
+                .map(chatRoom -> ChatRoomResponseDto.builder()
+                        .chatRoomId(chatRoom.getId())
+                        .chatRoomName(chatRoom.getChatRoomName())
+                        .partnerUuid(chatRoom.getParticipants().stream()
+                                .filter(participant -> !participant.getUserUuid().equals(userUuid))
+                                .map(ChatRoomDocument.Participant::getUserUuid)
+                                .findFirst()
+                                .orElse(null))
+                        .partnerIsActive(chatRoom.getParticipants().stream()
+                                .anyMatch(participant -> !participant.getUserUuid().equals(userUuid)
+                                        && "active".equals(participant.getStatus())))
+                        .recentMessage(chatRoom.getRecentMessage())
+                        .recentMessageTime(chatRoom.getRecentMessageTime())
+                        .unreadCount(chatRoom.getUnreadCount())
+                        .build())
+                .toList();
+
     }
 
 }
