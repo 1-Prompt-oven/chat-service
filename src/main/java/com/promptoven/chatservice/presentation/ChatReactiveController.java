@@ -37,7 +37,8 @@ public class ChatReactiveController {
 
         log.info("userUuid: {}", userUuid);
 
-        Flux<ChatRoomResponseDto> chatRoomResponseDto = chatReactiveService.getChatRoomList(userUuid);
+        Flux<ChatRoomResponseDto> chatRoomResponseDto = chatReactiveService.getChatRoomList(userUuid)
+                .switchIfEmpty(Flux.empty()); // 값이 없으면 빈 Flux 반환
 
         log.info("chatRoomResponseDto: {}", chatRoomResponseDto);
 
