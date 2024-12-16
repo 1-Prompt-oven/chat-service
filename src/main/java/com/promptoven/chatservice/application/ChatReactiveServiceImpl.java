@@ -196,17 +196,7 @@ public class ChatReactiveServiceImpl implements ChatReactiveService {
         log.info("sendMessageDto: {}", sendMessageDto);
 
         // 메시지 저장
-        return mongoChatMessageRepository.save(chatDtoMapper.toChatMessageDocument(sendMessageDto))
-                .publishOn(Schedulers.boundedElastic())
-                .flatMap(savedMessage -> {
-                    // 채팅방 업데이트 비동기로 실행
-                    updateChatRoomOnMessageSend(
-                            savedMessage.getRoomId(),
-                            savedMessage.getMessage(),
-                            savedMessage.getUpdatedAt()
-                    ).block();
-                    return Mono.just(savedMessage); // 메시지 저장 결과는 반환
-                });
+        return mongoChatMessageRepository.save(chatDtoMapper.toChatMessageDocument(sendMessageDto));
     }
 
     // 채팅 메시지 전송 시 발생하는 채팅방 업데이트 (읽지않음 수 증가 및 최근 메시지 변경)
