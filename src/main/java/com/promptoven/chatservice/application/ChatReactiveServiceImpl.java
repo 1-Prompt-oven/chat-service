@@ -27,6 +27,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Slf4j
 @Service
@@ -196,16 +197,14 @@ public class ChatReactiveServiceImpl implements ChatReactiveService {
 
         // 메시지 저장
         return mongoChatMessageRepository.save(chatDtoMapper.toChatMessageDocument(sendMessageDto))
+                .publishOn(Schedulers.boundedElastic())
                 .flatMap(savedMessage -> {
                     // 채팅방 업데이트 비동기로 실행
                     updateChatRoomOnMessageSend(
                             savedMessage.getRoomId(),
                             savedMessage.getMessage(),
                             savedMessage.getUpdatedAt()
-                    ).subscribe(
-                            success -> log.info("Chat room updated successfully for roomId: {}", savedMessage.getRoomId()),
-                            error -> log.error("Failed to update chat room for roomId: {}", savedMessage.getRoomId(), error)
-                    );
+                    ).block();
                     return Mono.just(savedMessage); // 메시지 저장 결과는 반환
                 });
     }
