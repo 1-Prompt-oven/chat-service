@@ -1,7 +1,9 @@
 package com.promptoven.chatservice.vo.in;
 
 import lombok.Getter;
+import lombok.ToString;
 
+@ToString
 @Getter
 public class SendMessageVo {
 

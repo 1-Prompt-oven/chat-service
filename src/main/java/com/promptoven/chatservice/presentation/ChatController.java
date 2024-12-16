@@ -21,6 +21,7 @@ import com.promptoven.chatservice.vo.out.ChatRoomResponseVo;
 import com.promptoven.chatservice.vo.out.CreateRoomResponseVo;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 @RestController
 @RequestMapping("/v1/member/chat")
 @RequiredArgsConstructor
@@ -54,6 +56,7 @@ public class ChatController {
 
     @PostMapping("/send")
     public Mono<ChatMessageDocument> sendChatMessage(@RequestBody SendMessageVo sendMessageVo) {
+        log.info("sendChatMessage: {}", sendMessageVo);
         return chatReactiveService.sendMessage(chatVoMapper.toSendMessageDto(sendMessageVo));
     }
 

@@ -192,6 +192,7 @@ public class ChatReactiveServiceImpl implements ChatReactiveService {
     // 채팅 메시지 전송
     @Override
     public Mono<ChatMessageDocument> sendMessage(SendMessageDto sendMessageDto) {
+        log.info("sendMessageDto: {}", sendMessageDto);
         return mongoChatMessageRepository.save(chatDtoMapper.toChatMessageDocument(sendMessageDto))
                 .flatMap(savedMessage ->
                         updateChatRoomOnMessageSend(
