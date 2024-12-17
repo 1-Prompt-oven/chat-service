@@ -10,6 +10,7 @@ import com.promptoven.chatservice.dto.mapper.ChatDtoMapper;
 import com.promptoven.chatservice.dto.out.ChatMessageResponseDto;
 import com.promptoven.chatservice.dto.out.ChatRoomResponseDto;
 import com.promptoven.chatservice.infrastructure.MongoChatMessageRepository;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import reactor.util.retry.Retry;
 
 @Slf4j
 @Service
@@ -45,13 +47,10 @@ public class ChatReactiveServiceImpl implements ChatReactiveService {
 
         ChangeStreamOptions options = ChangeStreamOptions.builder()
                 .filter(Aggregation.newAggregation(
-                        Aggregation.match(Criteria.where("operationType").in(
-                                OperationType.INSERT.getValue(),
-                                OperationType.UPDATE.getValue()
-                        )),
-                        Aggregation.match(Criteria.where("fullDocument.roomId").is(roomId))
+                        Aggregation.match(Criteria.where("operationType").in("insert", "update")
+                                .and("fullDocument.roomId").is(roomId))
                 ))
-                .fullDocumentLookup(FullDocument.UPDATE_LOOKUP) // 변경된 문서 전체 조회
+                .fullDocumentLookup(FullDocument.UPDATE_LOOKUP)
                 .build();
 
         return chatFluxMapper.toChatMessageResponseDto(
@@ -70,6 +69,11 @@ public class ChatReactiveServiceImpl implements ChatReactiveService {
                                         ZoneId.systemDefault()))
                                 .build()
                         )
+                        .onErrorResume(e -> {
+                            log.error("Change Stream Error: {}", e.getMessage());
+                            return Flux.empty();
+                        })
+                        .retryWhen(Retry.backoff(5, Duration.ofSeconds(5))) // 재시도 설정
         );
     }
 

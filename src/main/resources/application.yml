@@ -32,7 +32,7 @@ spring:
     name: chat-service
   data:
     mongodb:
-      uri: mongodb://localhost:27018/chatDB?directConnection=true
+      uri: mongodb+srv://1630202:minjihun@promptoven.5ld4d.mongodb.net/promptoven?retryWrites=true&w=majority&appName=promptoven
   cloud:
     config:
       enabled: false
