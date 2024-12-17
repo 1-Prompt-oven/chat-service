@@ -4,7 +4,9 @@ import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
+@ToString
 @Getter
 @NoArgsConstructor
 public class ChatMessageResponseDto {

@@ -29,6 +29,8 @@ public class ChatReactiveController {
 
         Flux<ChatMessageResponseDto> chatMessageResponseDtoFlux = chatReactiveService.getMessageByRoomId(roomId);
 
+        log.info("chatMessageResponseDtoFlux: {}", chatMessageResponseDtoFlux);
+
         return chatFluxMapper.toChatMessageResponseVo(chatMessageResponseDtoFlux);
     }
 
