@@ -80,6 +80,10 @@ public class ChatReactiveServiceImpl implements ChatReactiveService {
                             log.error("Change Stream Error: {}", e.getMessage());
                             return Flux.error(new RuntimeException("Change Stream Error", e)); // 더 나은 예외 전파
                         })
+                        .doOnSubscribe(subscription -> log.info("Change Stream Subscribed"))
+                        .doOnNext(message -> log.info("New Message Received: {}", message)) // 수신된 데이터 로그
+                        .doOnComplete(() -> log.info("Change Stream Completed"))
+                        .doOnCancel(() -> log.info("Change Stream Cancelled"))
         );
     }
 

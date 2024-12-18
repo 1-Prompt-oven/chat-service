@@ -27,7 +27,9 @@ public class ChatReactiveController {
     @GetMapping(value = "/new/{roomId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ChatMessageResponseVo> getChatByRoomId(@PathVariable String roomId) {
 
-        Flux<ChatMessageResponseDto> chatMessageResponseDtoFlux = chatReactiveService.getMessageByRoomId(roomId);
+        Flux<ChatMessageResponseDto> chatMessageResponseDtoFlux = chatReactiveService.getMessageByRoomId(roomId)
+                .doOnError(e -> log.error("Error during SSE stream: ", e))
+                .doFinally(signal -> log.info("SSE Connection Ended with signal: {}", signal));;
 
         log.info("chatMessageResponseDtoFlux: {}", chatMessageResponseDtoFlux);
 
