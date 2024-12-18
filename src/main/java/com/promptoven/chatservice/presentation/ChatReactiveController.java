@@ -28,8 +28,6 @@ public class ChatReactiveController {
     public Flux<ChatMessageResponseVo> getChatByRoomId(@PathVariable String roomId) {
 
         Flux<ChatMessageResponseDto> chatMessageResponseDtoFlux = chatReactiveService.getMessageByRoomId(roomId)
-                .doOnError(e -> log.error("Error during SSE stream: ", e))
-                .doFinally(signal -> log.info("SSE Connection Ended with signal: {}", signal))
                 .doOnNext(chatMessageResponseDto -> log.info("chatMessageResponseDto: {}", chatMessageResponseDto));
 
         return chatFluxMapper.toChatMessageResponseVo(chatMessageResponseDtoFlux);
