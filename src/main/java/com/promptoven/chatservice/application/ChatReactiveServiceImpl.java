@@ -10,10 +10,11 @@ import com.promptoven.chatservice.dto.mapper.ChatDtoMapper;
 import com.promptoven.chatservice.dto.out.ChatMessageResponseDto;
 import com.promptoven.chatservice.dto.out.ChatRoomResponseDto;
 import com.promptoven.chatservice.infrastructure.MongoChatMessageRepository;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
@@ -28,8 +29,6 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
-import reactor.util.retry.Retry;
 
 @Slf4j
 @Service
@@ -50,30 +49,37 @@ public class ChatReactiveServiceImpl implements ChatReactiveService {
                         Aggregation.match(Criteria.where("operationType").in("insert", "update")
                                 .and("fullDocument.roomId").is(roomId))
                 ))
-                .fullDocumentLookup(FullDocument.UPDATE_LOOKUP)
+                .fullDocumentLookup(FullDocument.UPDATE_LOOKUP) // 전체 문서 반환
                 .build();
 
         return chatFluxMapper.toChatMessageResponseDto(
                 reactiveMongoTemplate.changeStream("chatMessage", options, Document.class)
                         .map(ChangeStreamEvent::getBody)
-                        .map(document -> ChatMessageDocument.builder()
-                                .id(document.get("_id", ObjectId.class).toString())
-                                .roomId(document.getString("roomId"))
-                                .senderUuid(document.getString("senderUuid"))
-                                .messageType(document.getString("messageType"))
-                                .message(document.getString("message"))
-                                .isRead(document.getBoolean("isRead"))
-                                .createdAt(LocalDateTime.ofInstant(document.getDate("createdAt").toInstant(),
-                                        ZoneId.systemDefault()))
-                                .updatedAt(LocalDateTime.ofInstant(document.getDate("updatedAt").toInstant(),
-                                        ZoneId.systemDefault()))
-                                .build()
-                        )
+                        .filter(Objects::nonNull) // null 필터링
+                        .map(document -> {
+                            Date createdAt = document.getDate("createdAt");
+                            Date updatedAt = document.getDate("updatedAt");
+
+                            log.info("Received Document: {}", document);
+                            return ChatMessageDocument.builder()
+                                    .id(document.get("_id", ObjectId.class).toString())
+                                    .roomId(document.getString("roomId"))
+                                    .senderUuid(document.getString("senderUuid"))
+                                    .messageType(document.getString("messageType"))
+                                    .message(document.getString("message"))
+                                    .isRead(document.getBoolean("isRead"))
+                                    .createdAt(createdAt != null ?
+                                            LocalDateTime.ofInstant(createdAt.toInstant(), ZoneId.systemDefault())
+                                            : LocalDateTime.now())
+                                    .updatedAt(updatedAt != null ?
+                                            LocalDateTime.ofInstant(updatedAt.toInstant(), ZoneId.systemDefault())
+                                            : LocalDateTime.now())
+                                    .build();
+                        })
                         .onErrorResume(e -> {
                             log.error("Change Stream Error: {}", e.getMessage());
-                            return Flux.empty();
+                            return Flux.error(new RuntimeException("Change Stream Error", e)); // 더 나은 예외 전파
                         })
-                        .retryWhen(Retry.backoff(5, Duration.ofSeconds(5))) // 재시도 설정
         );
     }
 
@@ -112,7 +118,8 @@ public class ChatReactiveServiceImpl implements ChatReactiveService {
                             .recentMessageTime(chatRoom.getRecentMessageTime())
                             .partnerUuid(partnerUuid)
                             .partnerIsActive(chatRoom.getParticipants().stream()
-                                    .anyMatch(participant -> !participant.getUserUuid().equals(userUuid) && "active".equals(participant.getStatus())))
+                                    .anyMatch(participant -> !participant.getUserUuid().equals(userUuid)
+                                            && "active".equals(participant.getStatus())))
                             .unreadCount(chatRoom.getUnreadCount())
                             .build();
                 });
@@ -139,7 +146,8 @@ public class ChatReactiveServiceImpl implements ChatReactiveService {
                                 .orElse(null)
                 )
                 .partnerIsActive(chatRoom.getParticipants().stream()
-                        .anyMatch(participant -> !participant.getUserUuid().equals(userUuid) && "active".equals(participant.getStatus())))
+                        .anyMatch(participant -> !participant.getUserUuid().equals(userUuid) && "active".equals(
+                                participant.getStatus())))
                 .unreadCount(chatRoom.getUnreadCount())
                 .build());
     }
@@ -189,7 +197,6 @@ public class ChatReactiveServiceImpl implements ChatReactiveService {
                             .createdAt(chatRoom.getCreatedAt())
                             .build();
 
-
                     return reactiveMongoTemplate.save(updatedChatRoom, "chat");
                 }).then();
     }
@@ -197,6 +204,7 @@ public class ChatReactiveServiceImpl implements ChatReactiveService {
     // 채팅 메시지 전송
     @Override
     public Mono<ChatMessageDocument> sendMessage(SendMessageDto sendMessageDto) {
+
         log.info("sendMessageDto: {}", sendMessageDto);
 
         // 메시지 저장
@@ -204,7 +212,8 @@ public class ChatReactiveServiceImpl implements ChatReactiveService {
     }
 
     // 채팅 메시지 전송 시 발생하는 채팅방 업데이트 (읽지않음 수 증가 및 최근 메시지 변경)
-    private Mono<ChatRoomDocument> updateChatRoomOnMessageSend(String roomId, String recentMessage, LocalDateTime recentMessageTime) {
+    private Mono<ChatRoomDocument> updateChatRoomOnMessageSend(String roomId, String recentMessage,
+            LocalDateTime recentMessageTime) {
         return reactiveMongoTemplate.findAndModify(
                 Query.query(Criteria.where("_id").is(roomId)),
                 new Update()
