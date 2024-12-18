@@ -25,12 +25,12 @@ public class ChatReactiveController {
     private final ChatReactiveService chatReactiveService;
 
     @GetMapping(value = "/new/{roomId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ChatMessageResponseVo> getChatByRoomId(@PathVariable String roomId) {
+    public Flux<ChatMessageResponseDto> getChatByRoomId(@PathVariable String roomId) {
 
         Flux<ChatMessageResponseDto> chatMessageResponseDtoFlux = chatReactiveService.getMessageByRoomId(roomId)
                 .doOnNext(chatMessageResponseDto -> log.info("chatMessageResponseDto: {}", chatMessageResponseDto));
 
-        return chatFluxMapper.toChatMessageResponseVo(chatMessageResponseDtoFlux);
+        return chatMessageResponseDtoFlux;
     }
 
     @GetMapping(value = "/chatRoomList/{userUuid}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
